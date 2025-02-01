@@ -1,2 +1,3 @@
 __pycache__
 data/preprocessed/lichess_games.csv
+*.pkl
