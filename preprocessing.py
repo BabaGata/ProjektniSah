@@ -6,6 +6,7 @@ import json
 import os
 import io
 from constants import *
+import pickle  # For pickle saving
 
 class Preprocessing:
     
@@ -87,26 +88,24 @@ class Preprocessing:
         return matrices
 
     def process_data(self):
-        """Load raw data, preprocess, and save as a new CSV."""
-        # Load raw CSV
+        """Load raw data, preprocess, and save as pickle file."""
         df = pd.read_csv(os.path.join(self.raw_dir, self.filename))
 
-        # Create new dataframe
         data = []
         for _, row in df.iterrows():
             pgn = self.convert_to_pgn(row)
             matrices = self.get_game_matrices(pgn)
             data.append({
                 "pgn": pgn,
-                "matrices": json.dumps([matrix.tolist() for matrix in matrices]),
+                "matrices": np.array(matrices, dtype=np.int32),  # Store as NumPy array directly
                 "opening_eco": row[self.column_mapping["opening_eco"]],
                 "opening_ply": row[self.column_mapping["opening_ply"]]
             })
 
-        # Convert to DataFrame
         processed_df = pd.DataFrame(data)
 
-        # Save processed data
-        processed_df.to_csv(os.path.join(self.preprocessed_dir, self.filename), index=False)
+        # Save with pickle
+        with open(os.path.join(self.preprocessed_dir, self.filename.replace(".csv", ".pkl")), 'wb') as f:
+            pickle.dump(processed_df, f)
 
         print("Preprocessed data saved successfully!")
