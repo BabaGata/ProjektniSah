@@ -17,9 +17,9 @@ from dataset_classes.chess_dataset import ChessDataset
 NUM_EPOCHS = 50
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
-MAX_MOVES = 50
+MAX_MOVES = 40
 PLUS_MOVES = 0
-RARE_OPENINGS = 100
+RARE_OPENINGS = 200
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")

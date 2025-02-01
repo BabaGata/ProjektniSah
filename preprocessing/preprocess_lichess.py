@@ -2,14 +2,11 @@ import pandas as pd
 import chess
 import chess.pgn
 import numpy as np
-import json
 import os
 import io
 from constants import *
-import pickle  # For pickle saving
 
-class Preprocessing:
-    
+class PreprocessLichess:    
     def __init__(self, filename, raw_dir, preprocessed_dir, column_mapping=None):
         # Initialize instance variables
         self.filename = filename
@@ -96,16 +93,12 @@ class Preprocessing:
             pgn = self.convert_to_pgn(row)
             matrices = self.get_game_matrices(pgn)
             data.append({
-                "pgn": pgn,
-                "matrices": np.array(matrices, dtype=np.int32),  # Store as NumPy array directly
+                "matrices": np.array(matrices, dtype=np.int32),
                 "opening_eco": row[self.column_mapping["opening_eco"]],
                 "opening_ply": row[self.column_mapping["opening_ply"]]
             })
 
-        processed_df = pd.DataFrame(data)
+        return pd.DataFrame(data)
 
-        # Save with pickle
-        with open(os.path.join(self.preprocessed_dir, self.filename.replace(".csv", ".pkl")), 'wb') as f:
-            pickle.dump(processed_df, f)
-
-        print("Preprocessed data saved successfully!")
+        
+        
