@@ -14,7 +14,7 @@ from constants import *
 from models.chess_opening_classifier import ChessOpeningClassifier
 from dataset_classes.chess_dataset import ChessDataset
 
-FILENAME = "lichess_games_20K.csv"
+FILENAME = "lichess_games_20K.pkl"
 NUM_EPOCHS = 50
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
