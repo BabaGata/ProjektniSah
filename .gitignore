@@ -1,4 +1,5 @@
 *__pycache__
 *.pkl
-*.csv
+*raw*.csv
+*preprocessed*.csv
 *.zip
