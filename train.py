@@ -13,7 +13,7 @@ from constants import *
 from models.chess_opening_classifier import ChessOpeningClassifier
 from dataset_classes.chess_dataset import ChessDataset
 
-FILENAME = "lichess_games_20K.pkl"
+FILENAME = "lichess_games_6M.csv_1.pkl"
 NUM_EPOCHS = 50
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
@@ -51,7 +51,7 @@ def collate_fn(batch):
 
 def train_model():
     # Early stopping parameters
-    patience = 5  # How many epochs to wait for improvement
+    patience = 10  # How many epochs to wait for improvement
     min_delta = 0.01  # Minimum change to count as an improvement
     best_val_loss = float('inf')
     epochs_without_improvement = 0
@@ -82,6 +82,7 @@ def train_model():
         mlflow.log_param("max_moves", MAX_MOVES)
         mlflow.log_param("rare_openings", RARE_OPENINGS)
         mlflow.log_param("file_name", FILENAME)
+        mlflow.log_param("opening_moves", OPENING_MOVES)
         
         for epoch in range(NUM_EPOCHS):
             model.train()

@@ -2,6 +2,8 @@ import chess
 
 PREPROCESSED_DIR = "data/preprocessed/"
 RAW_DIR = "data/raw/"
+MY_DIR = "data/my_data/"
+
 MAX_MOVES = 40
 OPENING_MOVES = 10
 

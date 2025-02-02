@@ -8,7 +8,7 @@ from constants import *
 from tqdm import tqdm
 
 class PreprocessLichess:    
-    def __init__(self, filename, raw_dir, preprocessed_dir, column_mapping, eco_mapping, chunk_size=100000):
+    def __init__(self, filename, raw_dir=RAW_DIR, preprocessed_dir=PREPROCESSED_DIR, column_mapping=COLUMN_MAPPING, eco_mapping=ECO_MAPPING, chunk_size=100000):
         self.filename = filename
         self.raw_dir = raw_dir
         self.preprocessed_dir = preprocessed_dir

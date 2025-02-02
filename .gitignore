@@ -2,4 +2,7 @@
 *.pkl
 data/reprocessed/
 data/raw/
+data/my_data/lichess
+data/my_data/preprocessed
+data/my_data/predictions
 *.zip
