@@ -1,5 +1,5 @@
 *__pycache__
 *.pkl
-*raw*.csv
-*preprocessed*.csv
+data/reprocessed/
+data/raw/
 *.zip
