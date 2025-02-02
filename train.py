@@ -9,7 +9,6 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-import pickle
 from constants import *
 from models.chess_opening_classifier import ChessOpeningClassifier
 from dataset_classes.chess_dataset import ChessDataset
@@ -25,17 +24,8 @@ RARE_OPENINGS = 200
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-# Assuming your ECO codes are mapped in the file
-eco_mapping_df = pd.read_csv("data/ECO_codes.csv")
-eco_mapping = {eco: idx for idx, eco in enumerate(eco_mapping_df["code"].unique())}
-
-def load_preprocessed_data(filename):
-    with open(filename, 'rb') as f:
-        df = pickle.load(f)
-    return df
-
 def preprocess_data():
-    df = load_preprocessed_data(os.path.join(PREPROCESSED_DIR, FILENAME))
+    df = pd.read_pickle(os.path.join(PREPROCESSED_DIR, FILENAME))
     
     def will_have_zero_moves(matrices, opening_ply, max_moves=MAX_MOVES):
         trim_moves = 2 * opening_ply + PLUS_MOVES
@@ -75,7 +65,7 @@ def train_model():
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, collate_fn=collate_fn, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, collate_fn=collate_fn, shuffle=False)
     
-    num_classes = len(eco_mapping)
+    num_classes = len(ECO_MAPPING)
     model = ChessOpeningClassifier(num_classes).to(device)
 
     criterion = nn.CrossEntropyLoss()
