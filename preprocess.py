@@ -5,14 +5,8 @@ import os
 import pandas as pd
 
 FILENAME = "lichess_games_6M.csv"
-eco_mapping_df = pd.read_csv("data/ECO_codes_mapping.csv")
-eco_mapping = {
-    row["eco"]: {
-        "index": idx,
-        "opening_ply": len(row["pgn"].split())  # Count number of moves in PGN
-    }
-    for idx, row in eco_mapping_df.iterrows()
-}
+eco_mapping_df = pd.read_csv("data/ECO_codes.csv")
+eco_mapping = {eco: idx for idx, eco in enumerate(eco_mapping_df["code"].unique())}
 
 # Initialize Preprocessing class with directory paths and column mapping
 preprocessor = PreprocessLichess(

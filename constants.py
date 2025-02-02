@@ -3,6 +3,7 @@ import chess
 PREPROCESSED_DIR = "data/preprocessed/"
 RAW_DIR = "data/raw/"
 MAX_MOVES = 40
+OPENING_MOVES = 10
 
 PIECE_TO_INT = {
     chess.PAWN: 1,

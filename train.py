@@ -14,7 +14,7 @@ from constants import *
 from models.chess_opening_classifier import ChessOpeningClassifier
 from dataset_classes.chess_dataset import ChessDataset
 
-FILENAME = "lichess_games_6M.csv"
+FILENAME = "lichess_games_20K.csv"
 NUM_EPOCHS = 50
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
@@ -26,8 +26,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Assuming your ECO codes are mapped in the file
-eco_mapping_df = pd.read_csv("data/ECO_codes_mapping.csv")
-eco_mapping = {eco: idx for idx, eco in enumerate(eco_mapping_df["eco"].unique())}
+eco_mapping_df = pd.read_csv("data/ECO_codes.csv")
+eco_mapping = {eco: idx for idx, eco in enumerate(eco_mapping_df["code"].unique())}
 
 def load_preprocessed_data(filename):
     with open(filename, 'rb') as f:
@@ -91,6 +91,7 @@ def train_model():
         mlflow.log_param("batch_size", BATCH_SIZE)
         mlflow.log_param("max_moves", MAX_MOVES)
         mlflow.log_param("rare_openings", RARE_OPENINGS)
+        mlflow.log_param("file_name", FILENAME)
         
         for epoch in range(NUM_EPOCHS):
             model.train()

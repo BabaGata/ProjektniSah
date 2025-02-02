@@ -5,6 +5,7 @@ import numpy as np
 import os
 import io
 from constants import *
+from tqdm import tqdm
 
 class PreprocessLichess:    
     def __init__(self, filename, raw_dir, preprocessed_dir, column_mapping, eco_mapping):
@@ -79,21 +80,21 @@ class PreprocessLichess:
         df = pd.read_csv(os.path.join(self.raw_dir, self.filename))
 
         data = []
-        for _, row in df.iterrows():
+        for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing Games"):
             pgn = self.convert_to_pgn(row)
             matrices = self.get_game_matrices(pgn)
 
-            eco_info = self.eco_mapping.get(row[self.column_mapping["opening_eco"]])
+            eco_code = self.eco_mapping.get(row[self.column_mapping["opening_eco"]])
 
-            if eco_info is None:
+            if eco_code is None:
                 continue
 
-            opening_ply = row[self.column_mapping["opening_ply"]] if self.column_mapping["opening_ply"] else eco_info["opening_ply"]
+            opening_ply = row[self.column_mapping["opening_ply"]] if self.column_mapping["opening_ply"] else OPENING_MOVES
 
 
             data.append({
                 "matrices": np.array(matrices, dtype=np.int32),
-                "encoded_eco": eco_info["index"],
+                "encoded_eco": eco_code,
                 "opening_ply": opening_ply
             })
 
