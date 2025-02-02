@@ -8,7 +8,7 @@ from constants import *
 from tqdm import tqdm
 
 class PreprocessLichess:    
-    def __init__(self, filename, raw_dir=RAW_DIR, preprocessed_dir=PREPROCESSED_DIR, column_mapping=COLUMN_MAPPING, eco_mapping=ECO_MAPPING, chunk_size=100000):
+    def __init__(self, filename, raw_dir=RAW_DIR, preprocessed_dir=PREPROCESSED_DIR, column_mapping=COLUMN_MAPPING, eco_mapping=ECO_MAPPING, chunk_size=1000000):
         self.filename = filename
         self.raw_dir = raw_dir
         self.preprocessed_dir = preprocessed_dir
@@ -58,7 +58,7 @@ class PreprocessLichess:
     def process_data(self):
         """Load raw data in chunks, preprocess, and save in smaller batches."""
         raw_file_path = os.path.join(self.raw_dir, self.filename)
-        
+
         # Ensure preprocessed directory exists
         os.makedirs(self.preprocessed_dir, exist_ok=True)
 
@@ -66,8 +66,19 @@ class PreprocessLichess:
 
         chunk_number = 0
         for chunk in pd.read_csv(raw_file_path, chunksize=self.chunk_size):
-            print("Processing Chunk: ", chunk_number)
+            print(f"Processing Chunk: {chunk_number}")
+
+            # Select valid columns and filter out low-rated players
             chunk = chunk[valid_columns]
+            chunk = chunk[
+                (chunk[self.column_mapping["white_rating"]] >= 1900) & 
+                (chunk[self.column_mapping["black_rating"]] >= 1900)
+            ]
+
+            if chunk.empty:
+                print(f"Skipping Chunk {chunk_number}: No games meet rating criteria.")
+                chunk_number += 1
+                continue  # Skip empty chunks
 
             data = []
             for _, row in tqdm(chunk.iterrows(), total=len(chunk), desc="Processing Data"):
@@ -86,12 +97,17 @@ class PreprocessLichess:
                     "opening_ply": opening_ply
                 })
 
+            if not data:
+                print(f"Skipping Chunk {chunk_number}: No valid games after processing.")
+                chunk_number += 1
+                continue  # Skip empty chunks
+
             # Save each chunk as a separate file
-            output_file = os.path.join(self.preprocessed_dir, f"{self.filename}_{chunk_number}.pkl")
+            output_file = os.path.join(self.preprocessed_dir, f"{self.filename.replace(".csv", "_1900")}_{chunk_number}.pkl")
             batch_df = pd.DataFrame(data)
             batch_df.to_pickle(output_file)
-            
+
             print(f"Saved chunk {chunk_number} to {output_file}")
             chunk_number += 1
-        
+
         print("All chunks processed successfully!")
