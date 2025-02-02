@@ -13,8 +13,8 @@ PIECE_TO_INT = {
     chess.KING: 6,
 }
 
-LICHESS_GAMES_CSV = {
-    "winner": "winner",
+LICHESS_GAMES_20K = {
+    "result": "winner",
     "white_id": "white_id",
     "black_id": "black_id",
     "white_rating": "white_rating",
@@ -25,6 +25,19 @@ LICHESS_GAMES_CSV = {
     "moves": "moves"
 }
 
+LICHESS_GAMES_6M = {
+    "result": "Result",
+    "white_id": "White",
+    "black_id": "Black",
+    "white_rating": "WhiteElo",
+    "black_rating": "BlackElo",
+    "opening_name": "Opening",
+    "opening_eco": "ECO",
+    "opening_ply": None,
+    "moves": "AN"
+}
+
 COLUMN_MAPPING = {
-    "lichess_games.csv": LICHESS_GAMES_CSV
+    "lichess_games_20K.csv": LICHESS_GAMES_20K,
+    "lichess_games_6M.csv": LICHESS_GAMES_6M
 }

@@ -14,6 +14,7 @@ from constants import *
 from models.chess_opening_classifier import ChessOpeningClassifier
 from dataset_classes.chess_dataset import ChessDataset
 
+FILENAME = "lichess_games_6M.csv"
 NUM_EPOCHS = 50
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
@@ -34,7 +35,7 @@ def load_preprocessed_data(filename):
     return df
 
 def preprocess_data():
-    df = load_preprocessed_data(os.path.join(PREPROCESSED_DIR, "lichess_games.pkl"))
+    df = load_preprocessed_data(os.path.join(PREPROCESSED_DIR, FILENAME))
     
     def will_have_zero_moves(matrices, opening_ply, max_moves=MAX_MOVES):
         trim_moves = 2 * opening_ply + PLUS_MOVES
@@ -42,9 +43,6 @@ def preprocess_data():
         return len(matrices[trim_moves:end_index]) == 0
     
     df = df[~df.apply(lambda row: will_have_zero_moves(row['matrices'], row['opening_ply']), axis=1)]
-    df["encoded_eco"] = df["opening_eco"].map(eco_mapping)
-    df = df.dropna(subset=["encoded_eco"])
-    df["encoded_eco"] = df["encoded_eco"].astype(int)
     eco_counts = df["encoded_eco"].value_counts()
     rare_classes = eco_counts[eco_counts < RARE_OPENINGS].index
     df = df[~df["encoded_eco"].isin(rare_classes)]

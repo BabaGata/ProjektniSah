@@ -7,22 +7,12 @@ import io
 from constants import *
 
 class PreprocessLichess:    
-    def __init__(self, filename, raw_dir, preprocessed_dir, column_mapping=None):
-        # Initialize instance variables
+    def __init__(self, filename, raw_dir, preprocessed_dir, column_mapping, eco_mapping):
         self.filename = filename
         self.raw_dir = raw_dir
         self.preprocessed_dir = preprocessed_dir
-        self.column_mapping = column_mapping or {
-            "winner": "winner",
-            "white_id": "white_id",
-            "black_id": "black_id",
-            "white_rating": "white_rating",
-            "black_rating": "black_rating",
-            "opening_name": "opening_name",
-            "opening_eco": "opening_eco",
-            "opening_ply": "opening_ply",
-            "moves": "moves"
-        }
+        self.column_mapping = column_mapping
+        self.eco_mapping = eco_mapping
     
     def format_moves(self, moves_str):
         """Format move sequence correctly for PGN by adding move numbers."""
@@ -40,7 +30,7 @@ class PreprocessLichess:
 
     def convert_to_pgn(self, row):
         """Convert a CSV row into a properly formatted PGN string."""
-        result = "1-0" if row[self.column_mapping["winner"]] == "white" else "0-1" if row[self.column_mapping["winner"]] == "black" else "*"
+        result = "1-0" if row[self.column_mapping["result"]] == "white" else "0-1" if row[self.column_mapping["result"]] == "black" else row[self.column_mapping["result"]]
         
         pgn = f"""[Event "?"]
 [Site "Lichess.org"]
@@ -92,10 +82,19 @@ class PreprocessLichess:
         for _, row in df.iterrows():
             pgn = self.convert_to_pgn(row)
             matrices = self.get_game_matrices(pgn)
+
+            eco_info = self.eco_mapping.get(row[self.column_mapping["opening_eco"]])
+
+            if eco_info is None:
+                continue
+
+            opening_ply = row[self.column_mapping["opening_ply"]] if self.column_mapping["opening_ply"] else eco_info["opening_ply"]
+
+
             data.append({
                 "matrices": np.array(matrices, dtype=np.int32),
-                "opening_eco": row[self.column_mapping["opening_eco"]],
-                "opening_ply": row[self.column_mapping["opening_ply"]]
+                "encoded_eco": eco_info["index"],
+                "opening_ply": opening_ply
             })
 
         return pd.DataFrame(data)
