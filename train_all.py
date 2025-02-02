@@ -13,12 +13,12 @@ from constants import *
 from models.chess_opening_classifier import ChessOpeningClassifier
 from dataset_classes.chess_dataset import ChessDataset
 
-NUM_EPOCHS_PER_FILE = 10
+NUM_EPOCHS_PER_FILE = 5
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
 MAX_MOVES = 40
 PLUS_MOVES = 0
-RARE_OPENINGS = 200
+RARE_OPENINGS = 0.8/100
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
@@ -27,13 +27,15 @@ def preprocess_data(filename):
     df = pd.read_pickle(os.path.join(PREPROCESSED_DIR, filename))
     
     def will_have_zero_moves(matrices, opening_ply, max_moves=MAX_MOVES):
-        trim_moves = 2 * opening_ply + PLUS_MOVES
+        trim_moves = 2 * OPENING_MOVES
         end_index = min(trim_moves + max_moves, len(matrices))
         return len(matrices[trim_moves:end_index]) == 0
     
     df = df[~df.apply(lambda row: will_have_zero_moves(row['matrices'], row['opening_ply']), axis=1)]
     eco_counts = df["encoded_eco"].value_counts()
-    rare_classes = eco_counts[eco_counts < RARE_OPENINGS].index
+    rare_cls_counts = int(len(df) * RARE_OPENINGS)
+    print("Removing rare openings with less then n examples: ", rare_cls_counts)
+    rare_classes = eco_counts[eco_counts < rare_cls_counts].index
     df = df[~df["encoded_eco"].isin(rare_classes)]
 
     train_df, test_df = train_test_split(df, test_size=0.2, stratify=df["encoded_eco"], random_state=42)
