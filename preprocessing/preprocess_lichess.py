@@ -90,7 +90,8 @@ class PreprocessLichess:
             output_file = os.path.join(self.preprocessed_dir, f"{self.filename}_{chunk_number}.pkl")
             batch_df = pd.DataFrame(data)
             batch_df.to_pickle(output_file)
+            
             print(f"Saved chunk {chunk_number} to {output_file}")
+            chunk_number += 1
         
-        chunk_number += 1
         print("All chunks processed successfully!")
