@@ -12,8 +12,9 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from constants import *
 from models.chess_opening_classifier import ChessOpeningClassifier
 from dataset_classes.chess_dataset import ChessDataset
+import re
 
-NUM_EPOCHS_PER_FILE = 5
+NUM_EPOCHS_PER_FILE = 10
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
 MAX_MOVES = 40
@@ -137,7 +138,8 @@ def train_on_file(model, optimizer, criterion, filename):
 
 def train_model():
     # Get all .pkl files from PREPROCESSED_DIR
-    pkl_files = [f for f in os.listdir(PREPROCESSED_DIR) if f.endswith(".pkl")]
+    pkl_files = [f for f in os.listdir(PREPROCESSED_DIR)
+                 if re.match(r'lichess_games_6M_1900_\d+\.pkl', f)]
 
     num_classes = len(ECO_MAPPING)
     model = ChessOpeningClassifier(num_classes).to(device)
